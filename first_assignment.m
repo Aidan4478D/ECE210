@@ -3,18 +3,18 @@
 % Assignment 01: Rolling in the Mud -- Practice and Perform Basic MATLAB Operations
 % Copyright (C) 2024 Aidan Cusa <aaidancusa@gmail.com>
 
-clc;
-clear;
+clc;    % clear command window
+clear;  % clear all variables from current workspace
 
 %% part 1
 u = [11, 13, 17];            % create row vector
 v = [-1; -1; -1];            % create column vector
 
 A0 = [-1 * u; 2 * u; 7 * u]; % create matrix by multiplying existing row
-% vector u by a scalar
+                             % vector u by a scalar
 
-B = [A', v];                 % create a matrix using the transpose of
-% matrix A and column vector v
+B = [A0', v];                % create a matrix using the transpose of
+                             % matrix A and column vector v
 
 %% part 2
 c = exp(1j * pi / 4);
