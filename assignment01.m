@@ -1,6 +1,6 @@
 % SPDX-License-Identifier: GPL-3.0-or-later
 %
-% Assignment 01: Rolling in the Mud -- Practice and Perform Basic MATLAB Operations
+% ECE210 assignment01.m -- Practice and Perform Basic MATLAB Operations
 % Copyright (C) 2024 Aidan Cusa <aidancusa@gmail.com>
 
 clc;    % clear command window
@@ -42,8 +42,8 @@ x = mldivide(A, b);
 OUTPUT = 'output.pdf';
 
 r = groot;
+
 delete(OUTPUT);
 for i = numel(r.Children):-1:1
-    exportgraphics(r.Children(i), OUTPUT, ...
-        'Append', true, 'ContentType', 'vector');
+    exportgraphics(r.Children(i), OUTPUT, 'Append', true, 'ContentType', 'vector');
 end
