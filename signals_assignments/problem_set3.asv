@@ -19,13 +19,17 @@ h_plot = s_plot(nh, h);
 x_plot = s_plot(nx, x);
 y_plot = c_plot(h, nh, x, nx);
 
+i = 0; 
+
 function c_p = c_plot(x, nx, h, nh)
     % calculate convolution values
     yd = conv(h, x);
 
     % create discrete time step vector
     yn = (nh(1) + nx(1)):(nh(end) + nx(end));
-
+    
+    i = i + 1;
+    subplot(plts, 1, i);
     c_p = stem(yn, yd); 
     xlim([yn(1) - length(yn) * 0.2, yn(end) + length(yn) * 0.2]);
     ylim([0, max(yd) + max(yd) * 0.25]);
