@@ -19,10 +19,10 @@ h_plot = s_plot(nh, h);
 x_plot = s_plot(nx, x);
 
 % find value vector and time index vector for convolution y = h * x
-[yd, yn] = c_vals(h, nh, x, nx);
+[yn, yd] = c_vals(h, nh, x, nx);
 y_plot = s_plot(yn, yd);
 
-function [yd, yn] = c_vals(x, nx, h, nh)
+function [yn, yd] = c_vals(h, nh, x, nx)
     % calculate convolution values
     yd = conv(h, x);
 
