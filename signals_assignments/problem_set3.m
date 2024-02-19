@@ -11,7 +11,7 @@ close all;
 h = [2, 3, 4, 2, 5];
 x = [3, 4, 5, 1, 2]; 
 
-% time index vector // first entry represents n = 0
+% time index vectors corresponding to data value vector indices
 nh = [-1, 0, 1, 2, 3]; 
 nx = [-2, -1, 0, 1, 2]; 
 
