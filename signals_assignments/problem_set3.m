@@ -17,21 +17,17 @@ nx = [-2, -1, 0, 1, 2];
 
 h_plot = s_plot(nh, h);
 x_plot = s_plot(nx, x);
-y_plot = c_plot(h, nh, x, nx);
 
-function c_p = c_plot(x, nx, h, nh)
+% find value vector and time index vector for convolution y = h * x
+[yd, yn] = c_vals(h, nh, x, nx);
+y_plot = s_plot(yn, yd);
+
+function [yd, yn] = c_vals(x, nx, h, nh)
     % calculate convolution values
     yd = conv(h, x);
 
     % create discrete time step vector
     yn = (nh(1) + nx(1)):(nh(end) + nx(end));
-
-    c_p = stem(yn, yd); 
-    xlim([yn(1) - length(yn) * 0.2, yn(end) + length(yn) * 0.2]);
-    ylim([0, max(yd) + max(yd) * 0.25]);
-    ylabel('y = x * h');
-    xlabel('Discrete time-step n');
-    title('Convolution of x(n) and h(n)');
 end
 
 % function that creates a stem plot based on 
