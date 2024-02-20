@@ -15,11 +15,16 @@ x = [3, 4, 5, 1, 2];
 nh = [-1, 0, 1, 2, 3]; 
 nx = [-2, -1, 0, 1, 2]; 
 
+figure;
 h_plot = s_plot(nh, h);
+
+figure;
 x_plot = s_plot(nx, x);
 
 % find value vector and time index vector for convolution y = h * x
 [yn, yd] = c_vals(h, nh, x, nx);
+
+figure;
 y_plot = s_plot(yn, yd);
 
 function [yn, yd] = c_vals(h, nh, x, nx)
