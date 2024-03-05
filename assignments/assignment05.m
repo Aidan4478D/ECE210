@@ -20,7 +20,7 @@ end
 
 title('Square Wave with n=50');
 xlabel('Time [t]');
-xlim([-pi, pi])
+xlim([-pi - 0.5, pi + 0.5])
 xticklabels({'-\pi', '-\pi/2', '0', '\pi/2', '\pi'})
 xticks([-pi, -pi/2, 0, pi/2, pi]);
 ylabel('y');
@@ -29,16 +29,29 @@ ylabel('y');
 figure;
 subplot(2, 1, 1);
 plot(t, fourier_sum(0:50, t))
-title("Square Wave n=50 Approximation")
+title("Square Wave n=50 Approximation");
+xlabel('Time [t]');
+xlim([-pi - 0.5, pi + 0.5])
+xticklabels({'-\pi', '-\pi/2', '0', '\pi/2', '\pi'})
+xticks([-pi, -pi/2, 0, pi/2, pi]);
+ylabel('y');
 
 subplot(2, 1, 2);
+title("Square Wave n= 0-49 Approximation");
+xlabel('Time [t]');
+xlim([-pi - 0.5, pi + 0.5])
+xticklabels({'-\pi', '-\pi/2', '0', '\pi/2', '\pi'})
+xticks([-pi, -pi/2, 0, pi/2, pi]);
+ylabel('y');
+
 hold on;
 
 for i = 0:(n - 1)
     plot(t, fourier_sum(0:i, t))
 end
 
-hold off; 
+sgtitle("Fourier Square Wave Approximation");
+hold off; % is this necessary?
 
 %% part 3
 
@@ -59,7 +72,7 @@ surf(X, Y, z)
 
 L = 160*membrane(1,100);
 figure;
-logo = surf(L)
+logo = surf(L);
 logo.EdgeColor = 'none';
 
 l1 = light;
