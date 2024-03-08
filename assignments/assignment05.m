@@ -7,20 +7,29 @@ clc;    % clear command window
 clear;  % clear all variables from current worwkspace
 close all; 
 
+
 %% part 1
-n = 50; 
+n = 50;
 t = linspace(-pi, pi, 1000);
-                             
+
+a_n = (2 .* (0:n) + 1)';
+
+terms = zeros(length(t), n); % matrix for individual terms
+sq = sum(sin(a_n .* t) ./ a_n); % THE square wave
+
+for i = 1:n
+    terms(:, i) = sin(a_n(i) * t) ./ a_n(i); % fill matrix with terms
+end
+                   
 figure; 
 hold on;
 
-for i = 0:n
-    plot(t, fourier_sum(0:i, t))
-end
+plot(t, terms)
+plot(t, sq)
 
 title('Square Wave with n=50');
-xlabel('Time [t]');
-xlim([-pi - 0.5, pi + 0.5])
+xlabel('X [rad]');
+xlim([t(1), t(end)])
 xticklabels({'-\pi', '-\pi/2', '0', '\pi/2', '\pi'})
 xticks([-pi, -pi/2, 0, pi/2, pi]);
 ylabel('y');
@@ -28,27 +37,25 @@ ylabel('y');
 %% part 2
 figure;
 subplot(2, 1, 1);
-plot(t, fourier_sum(0:50, t))
+plot(t, sq)
+%plot(t, fourier_sum(0:50, t))
 title("Square Wave n=50 Approximation");
-xlabel('Time [t]');
-xlim([-pi - 0.5, pi + 0.5])
+xlabel('X [rad]');
+xlim([t(1), t(end)])
 xticklabels({'-\pi', '-\pi/2', '0', '\pi/2', '\pi'})
 xticks([-pi, -pi/2, 0, pi/2, pi]);
 ylabel('y');
 
 subplot(2, 1, 2);
+plot(t, terms)
 title("Square Wave n= 0-49 Approximation");
-xlabel('Time [t]');
-xlim([-pi - 0.5, pi + 0.5])
+xlabel('X [rad]');
+xlim([t(1), t(end)])
 xticklabels({'-\pi', '-\pi/2', '0', '\pi/2', '\pi'})
 xticks([-pi, -pi/2, 0, pi/2, pi]);
 ylabel('y');
 
 hold on;
-
-for i = 0:(n - 1)
-    plot(t, fourier_sum(0:i, t))
-end
 
 sgtitle("Fourier Square Wave Approximation");
 hold off; % is this necessary?
@@ -95,9 +102,3 @@ logo.SpecularColorReflectance = 1;
 logo.SpecularExponent = 7;
 
 axis off
-
-
-function f_s = fourier_sum(n, t)
-    a_n = (2 * n + 1)';
-    f_s = sum(sin(a_n * t) ./ a_n);
-end
