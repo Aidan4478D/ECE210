@@ -38,7 +38,7 @@ subplot(2, 2, 2);
 plot(wout_eA, mag_eA);
 
 xlim([0, fn]); % x limits from DC to Nyquist Bandwidth
-xticklabels(linspace(0, fn / 1e6, 6)); 
+xticklabels(0:5);
 xlabel('Frequency [MHz]');
 ylabel('Magnitude [dB]');
 title("Magnitude Response");
@@ -47,7 +47,7 @@ subplot(2, 2, 4);
 plot(wout_eA, phasedeg_eA);
 
 xlim([0, fn]); % x limits from DC to Nyquist Bandwidth
-xticklabels(linspace(0, fn / 1e6, 6));
+xticklabels(0:5);
 xlabel('Frequency [MHz]');
 ylabel('Phase [Degrees]');
 title("Phase Response");
@@ -77,16 +77,17 @@ phasedeg_cA = phase_cA*180/pi;
 figure;
 subplot(2, 2, 2);
 plot(wout_cA, mag_cA);
-
-xticklabels(linspace(0, fn / 1e6, 6)); 
+xlim([0, fn]); % x limits from DC to Nyquist Bandwidth
+xticklabels(0:5);
 xlabel('Frequency [MHz]');
 ylabel('Magnitude [dB]');
 title("Magnitude Response");
 
+
 subplot(2, 2, 4);
 plot(wout_cA, phasedeg_cA);
-
-xticklabels(linspace(0, fn / 1e6, 6));
+xlim([0, fn]); % x limits from DC to Nyquist Bandwidth
+xticklabels(0:5);
 xlabel('Frequency [MHz]');
 ylabel('Phase [Degrees]');
 title("Phase Response");
@@ -107,24 +108,30 @@ sgtitle("Analog Chebyshev I Filter");
 
 elliptic_digital_order = 2 * n_eD
 
-[h_eD, wout_eD] = freqz(b_eD, a_eD, 1e3); 
+w = linspace(0, pi, 10000); 
+
+[h_eD, wout_eD] = freqz(b_eD, a_eD, w); 
 mag_eD = 20 * log10(abs(h_eD));
 phase_eD = unwrap(angle(h_eD)); 
 phasedeg_eD = phase_eD*180/pi;
 
+f_dig = wout_eD * fs / (2 * pi); 
+
 figure;
 subplot(2, 2, 2);
-plot(wout_eD, mag_eD);
+plot(f_dig, mag_eD);
 
-xticklabels(linspace(0, fn / 1e6, 6)); 
+xlim([0, fn]); 
+xticklabels([0:5]); 
 xlabel('Frequency [MHz]');
 ylabel('Magnitude [dB]');
 title("Magnitude Response");
 
 subplot(2, 2, 4);
-plot(wout_eD, phasedeg_eD);
+plot(f_dig, phasedeg_eD);
 
-xticklabels(linspace(0, fn / 1e6, 6));
+xlim([0, fn]);
+xticklabels([0:5]);
 xlabel('Frequency [MHz]');
 ylabel('Phase [Degrees]');
 title("Phase Response");
@@ -145,24 +152,30 @@ sgtitle("Digital Elliptic Filter");
 
 cheby1_digital_order = 2 * n_cD
 
-[h_cD, wout_cD] = freqz(b_cD, a_cD, 1e3); 
+w = linspace(0, pi, 10000); 
+
+[h_cD, wout_cD] = freqz(b_cD, a_cD, w); 
 mag_cD = 20 * log10(abs(h_cD));
 phase_cD = unwrap(angle(h_cD)); 
 phasedeg_cD = phase_cD*180/pi;
 
+f_dig = wout_cD * fs / (2 * pi); 
+
 figure;
 subplot(2, 2, 2);
-plot(wout_cD, mag_cD);
+plot(f_dig, mag_cD);
 
-xticklabels(linspace(0, fn / 1e6, 6)); 
+xlim([0, fn]);
+xticklabels([0:5]); 
 xlabel('Frequency [MHz]');
 ylabel('Magnitude [dB]');
 title("Magnitude Response");
 
 subplot(2, 2, 4);
-plot(wout_cD, phasedeg_cD);
+plot(f_dig, phasedeg_cD);
 
-xticklabels(linspace(0, fn / 1e6, 6));
+xlim([0, fn]);
+xticklabels([0:5]);
 xlabel('Frequency [MHz]');
 ylabel('Phase [Degrees]');
 title("Phase Response");
