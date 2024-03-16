@@ -37,7 +37,9 @@ figure;
 subplot(2, 2, 2);
 plot(wout_eA, mag_eA);
 
+grid on;
 xlim([0, fn]); % x limits from DC to Nyquist Bandwidth
+ylim([-65, 5]);
 xticklabels(0:5);
 xlabel('Frequency [MHz]');
 ylabel('Magnitude [dB]');
@@ -46,6 +48,7 @@ title("Magnitude Response");
 subplot(2, 2, 4);
 plot(wout_eA, phasedeg_eA);
 
+grid on;
 xlim([0, fn]); % x limits from DC to Nyquist Bandwidth
 xticklabels(0:5);
 xlabel('Frequency [MHz]');
@@ -75,9 +78,13 @@ phase_cA = unwrap(angle(h_cA));
 phasedeg_cA = phase_cA*180/pi;
 
 figure;
+
 subplot(2, 2, 2);
 plot(wout_cA, mag_cA);
+
+grid on;
 xlim([0, fn]); % x limits from DC to Nyquist Bandwidth
+ylim([-300, 5]);
 xticklabels(0:5);
 xlabel('Frequency [MHz]');
 ylabel('Magnitude [dB]');
@@ -86,6 +93,8 @@ title("Magnitude Response");
 
 subplot(2, 2, 4);
 plot(wout_cA, phasedeg_cA);
+
+grid on;
 xlim([0, fn]); % x limits from DC to Nyquist Bandwidth
 xticklabels(0:5);
 xlabel('Frequency [MHz]');
@@ -121,8 +130,10 @@ figure;
 subplot(2, 2, 2);
 plot(f_dig, mag_eD);
 
+grid on;
 xlim([0, fn]); 
-xticklabels([0:5]); 
+ylim([-65, 5]);
+xticklabels(0:5); 
 xlabel('Frequency [MHz]');
 ylabel('Magnitude [dB]');
 title("Magnitude Response");
@@ -130,8 +141,9 @@ title("Magnitude Response");
 subplot(2, 2, 4);
 plot(f_dig, phasedeg_eD);
 
+grid on;
 xlim([0, fn]);
-xticklabels([0:5]);
+xticklabels(0:5);
 xlabel('Frequency [MHz]');
 ylabel('Phase [Degrees]');
 title("Phase Response");
@@ -140,6 +152,7 @@ subplot(2, 2, [1,3]);
 zplane(z_eD, p_eD); 
 
 sgtitle("Digital Elliptic Filter");
+
 
 %% filter 4 (digital chebyshev 1)
 
@@ -165,7 +178,9 @@ figure;
 subplot(2, 2, 2);
 plot(f_dig, mag_cD);
 
+grid on;
 xlim([0, fn]);
+ylim([-300, 5]);
 xticklabels([0:5]); 
 xlabel('Frequency [MHz]');
 ylabel('Magnitude [dB]');
@@ -174,7 +189,9 @@ title("Magnitude Response");
 subplot(2, 2, 4);
 plot(f_dig, phasedeg_cD);
 
+grid on;
 xlim([0, fn]);
+ylim([-1500, 25]);
 xticklabels([0:5]);
 xlabel('Frequency [MHz]');
 ylabel('Phase [Degrees]');
