@@ -15,12 +15,12 @@ c = 0.5; % d/lambda
 
 PdB = [0, -2, -4];
 PndB = 10;
-thetas1 = [10, 25, 70] * 2 * pi / 180;
-thetas2 = [10, 12, 70] * 2 * pi / 180;
+thetas1 = [10, 25, 70];
+thetas2 = [10, 12, 70];
 
 % data matrices A
-[S1, A1] = generate_data(M, N, thetas1, c, PdB, PndB);
-[S2, A2] = generate_data(M, N, thetas2, c, PdB, PndB);
+[S1, A1] = generate_data(M, N, thetas1 * pi / 180, c, PdB, PndB);
+[S2, A2] = generate_data(M, N, thetas2 * pi / 180, c, PdB, PndB);
 
 % correlation matrices 
 R1 = A1 * A1' / N;
@@ -60,46 +60,70 @@ eigval_ratio1 = eigvals1(3)/eigvals1(4)
 eigval_ratio2 = eigvals2(3)/eigvals2(4)
 
 % projection matrices onto noise subspace
-Pn1 = eye(M) - U1 * U1'; 
-Pn2 = eye(M) - U2 * U2';
+Pn1 = eye(M) - U1(:, [1:3])*U1(:, [1:3])';
+Pn2 = eye(M) - U2(:, [1:3])*U2(:, [1:3])';
 
 % inverses of R
 Rinv1 = inv(R1);
 Rinv2 = inv(R2);
 
+theta = 0:.2:180;
+S = exp(-1j * 2 * pi * c * (0:M-1)' .* cos(theta * pi / 180)) / sqrt(M);
+
 % MUSIC
 theta = 0:.2:180;
-mus1 = smusic(M, theta, c, Pn1);
-mus2 = smusic(M, theta, c, Pn2);
+music1 = smusic(M, theta * pi / 180, c, Pn1);
+music2 = smusic(M, theta * pi / 180, c, Pn2);
 
 % MVDR
-mvdr1 = smvdr(M, theta, c, Rinv1);
-mvdr2 = smvdr(M, theta, c, Rinv2);
+mvdr1 = smvdr(M, theta * pi / 180, c, Rinv1);
+mvdr2 = smvdr(M, theta * pi / 180, c, Rinv2);
 
 fig = figure;
 sgtitle('Matrix Analysis');
+
 subplot(2,2,1);
-plot(theta, mus1);
-title('MUSIC 1');
+plot(theta, music1);
+title('Music 1');
+xlabel('AOA [deg]');
+ylabel('S_{MUSIC}');
+for i = 1:length(thetas1)
+    xline(thetas1(i), 'm--', thetas1(i));
+end
 
 subplot(2,2,3);
-plot(theta, mus1);
-title('MUSIC 2');
+plot(theta, music2);
+title('Music 2');
+xlabel('AOA [deg]');
+ylabel('S_{MUSIC}');
+for i = 1:length(thetas2)
+    xline(thetas2(i), 'm--', thetas2(i));
+end
 
 subplot(2,2,2);
 plot(theta, mvdr1);
 title('MVDR 1');
+xlabel('AOA [deg]');
+ylabel('S_{MVDR}');
+for i = 1:length(thetas1)
+    xline(thetas1(i), 'm--', thetas1(i));
+end
 
 subplot(2,2,4);
 plot(theta, mvdr2);
 title('MVDR 2');
+xlabel('AOA [deg]');
+ylabel('S_{MVDR}');
+for i = 1:length(thetas2)
+    xline(thetas2(i), 'm--', thetas2(i));
+end
 
 
 %% Part 3
 S1_ = S1 * S1';
 S2_ = S2 * S2';
-% it tells how easy it is to separate the signals. if it is close to 0 then
-% it is easy to separate
+% it tells how easy it is to separate the signals. 
+% if it is close to 0 then it is easy to separate
 
 
 % M x N matrix
@@ -107,14 +131,14 @@ S2_ = S2 * S2';
 % c constant d/lambda
 % P power source vector
 % Pn noise power vector 
-function [S, A] = generate_data(M, N, theta, c, PdB, PndB)
+
+function [s, A] = generate_data(M, N, theta, c, PdB, PndB)
     
     % num sources
     L = length(theta);
     
     % steering vector
-    s = exp(-1j * 2 * pi * (0:M-1)' * (c * cos(theta)));
-    S = s / sqrt(M);  % Normalize
+    s = 1/sqrt(M) * exp(-1j * 2 * pi * (0:M-1)' * (c * cos(theta)));
     
     % variances
     var_s = 10 .^ (PdB / 10);
@@ -124,7 +148,7 @@ function [S, A] = generate_data(M, N, theta, c, PdB, PndB)
     V = sqrt(var_n) .* randn(M, N) + 1j .* randn(M, N) / sqrt(2);
     
     % Add noise, scaled by sqrt of M
-    A = S * B + V / sqrt(M);
+    A = s * B + V / sqrt(M);
 end
 
 % Part 2
@@ -137,10 +161,10 @@ end
 
 function music = smusic(M, theta, c, Pn)
     s = exp(-1j * 2 * pi * (0:M-1)' * (c * cos(theta)));
-    music = diag(1 ./ (s' * Pn * s));
+    music = real(diag(1 ./ (s' * Pn * s))); 
 end
 
 function mvdr = smvdr(M, theta, c, Rinv)
     s = exp(-1j * 2 * pi * (0:M-1)' * (c * cos(theta)));
-    mvdr = diag(1 ./ (s' * Rinv * s));
+    mvdr = real(diag(1 ./ (s' * Rinv * s)));
 end
