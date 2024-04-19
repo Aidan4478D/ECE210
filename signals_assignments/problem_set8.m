@@ -67,9 +67,6 @@ Pn2 = eye(M) - U2(:, [1:3])*U2(:, [1:3])';
 Rinv1 = inv(R1);
 Rinv2 = inv(R2);
 
-theta = 0:.2:180;
-S = exp(-1j * 2 * pi * c * (0:M-1)' .* cos(theta * pi / 180)) / sqrt(M);
-
 % MUSIC
 theta = 0:.2:180;
 music1 = smusic(M, theta * pi / 180, c, Pn1);
@@ -118,12 +115,27 @@ for i = 1:length(thetas2)
     xline(thetas2(i), 'm--', thetas2(i));
 end
 
+% the mvdr appears to be a lot noisier than music and the magnitudes of 
+% music are much greater than those of mvdr.
+
+disp(svals1(1)^2 / eigvals1(1))
+disp(svals1(2)^2 / eigvals1(2))
+disp(svals1(3)^2 / eigvals1(3))
+
+disp(svals2(1)^2 / eigvals2(1))
+disp(svals2(2)^2 / eigvals2(2))
+disp(svals2(3)^2 / eigvals2(3))
+
+% the ratio sigma ^2 / lambda is equal to 200 = N
+% thus, sigma ^2 = N * lambda
 
 %% Part 3
-S1_ = S1 * S1';
-S2_ = S2 * S2';
+S1_ = abs(S1 * S1')
+S2_ = abs(S2 * S2')
 % it tells how easy it is to separate the signals. 
 % if it is close to 0 then it is easy to separate
+
+% I don't we're displaying all of them but I will and will print it.
 
 
 % M x N matrix
@@ -160,11 +172,11 @@ function [sval, eigval, U] = SVD_EDecomp(A, R)
 end
 
 function music = smusic(M, theta, c, Pn)
-    s = exp(-1j * 2 * pi * (0:M-1)' * (c * cos(theta)));
+    s = 1 / sqrt(M) * exp(-1j * 2 * pi * (0:M-1)' * (c * cos(theta)));
     music = real(diag(1 ./ (s' * Pn * s))); 
 end
 
 function mvdr = smvdr(M, theta, c, Rinv)
-    s = exp(-1j * 2 * pi * (0:M-1)' * (c * cos(theta)));
+    s = 1 / sqrt(M) *  exp(-1j * 2 * pi * (0:M-1)' * (c * cos(theta)));
     mvdr = real(diag(1 ./ (s' * Rinv * s)));
 end
