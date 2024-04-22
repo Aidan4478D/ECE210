@@ -22,7 +22,7 @@ syms Vs(t) R C Vc(t);
 eq = Vs(t) == R * C * diff(Vc, t) + Vc(t);
 dsolve(eq)
 
-%% part 3
 
+%% part 3
 mu0 = sym(4 * 1e-7);
-mu0_f = vpa(mu0 * pi, digits(floor(1000 * pi)))
+mu0_f = vpa(mu0 * pi, floor(1000 * pi))
