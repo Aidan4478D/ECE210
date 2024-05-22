@@ -1,0 +1,179 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<META http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      -->
+<title>assignment08</title>
+<meta name="generator" content="MATLAB 23.2">
+<link rel="schema.DC" href="http://purl.org/dc/elements/1.1/">
+<meta name="DC.date" content="2024-04-22">
+<meta name="DC.source" content="assignment08.m">
+<style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; }
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+span.typesection { color:#A0522D }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style>
+</head>
+<body>
+<div class="content">
+<h2>Contents</h2>
+<div>
+<ul>
+<li>
+<a href="#2">part 1</a>
+</li>
+<li>
+<a href="#3">part 2</a>
+</li>
+<li>
+<a href="#4">part 3</a>
+</li>
+</ul>
+</div>
+<pre class="codeinput">
+<span class="comment">% SPDX-License-Identifier: GPL-3.0-or-later</span>
+<span class="comment">%</span>
+<span class="comment">% ECE210 assignment08.m -- Under Pressure</span>
+<span class="comment">% Copyright (C) 2024 Aidan Cusa &lt;aidancusa@gmail.com&gt;</span>
+
+clc;    <span class="comment">% clear command window</span>
+clear;  <span class="comment">% clear all variables from current worwkspace</span>
+close <span class="string">all</span>;
+</pre>
+<h2 id="2">part 1</h2>
+<pre class="codeinput">syms <span class="string">Ic</span> <span class="string">Vbe</span> <span class="string">Vt</span> <span class="string">Ae</span> <span class="string">q</span> <span class="string">Dn</span> <span class="string">ni</span> <span class="string">Nb</span> <span class="string">Wb</span>;
+
+Is = Ae * q * Dn * ni^2 / (Nb * Wb);
+eq = Ic == Is * exp(Vbe / Vt);
+
+solve(eq, Ae)
+</pre>
+<pre class="codeoutput"> 
+ans =
+ 
+(Ic*Nb*Wb*exp(-Vbe/Vt))/(Dn*ni^2*q)
+ 
+</pre>
+<h2 id="3">part 2</h2>
+<pre class="codeinput">syms <span class="string">Vs(t)</span> <span class="string">R</span> <span class="string">C</span> <span class="string">Vc(t)</span>;
+
+eq = Vs(t) == R * C * diff(Vc, t) + Vc(t);
+dsolve(eq)
+</pre>
+<pre class="codeoutput"> 
+ans =
+ 
+C1*exp(-t/(C*R)) + exp(-t/(C*R))*int((exp(t/(C*R))*Vs(t))/(C*R), t, 'IgnoreSpecialCases', true, 'IgnoreAnalyticConstraints', true)
+ 
+</pre>
+<h2 id="4">part 3</h2>
+<pre class="codeinput">mu0 = sym(4 * 1e-7);
+mu0_f = vpa(mu0 * pi, floor(1000 * pi))
+</pre>
+<pre class="codeoutput"> 
+mu0_f =
+ 
+0.00000125663706143591723851985757376677228472776726934020243168149336992896817345168567573762064583580974163008606221708812586058824048417269469852633994839435968699844194380846133867522857895747334945492212872088470415142443931762673785197505454558150081046440845211960881898803320982666631420379832555669820390973525542972611028014196615824311555498121556446467609168736776768625834881505243102182209892546664686339905720576757281793143162860195086315961402488713221941576366983591124588906708895451093500858583076619119697860880099762368111447390745973584031003757233003253956470970147543222988081597702961882160569444957041101731353248020963442608989061850845402560426607935446846248333098848037555177452971120530206425381877934348708008754280878423377370020046692796196638616245912585131398575493064454975017516006941619170519305932265512094538721371345271225671788582676295108583949907639208848714137188427100008599604837418358320487783988978490188990340478560110527523239468313274132107207415948587657817758013040147846531032128004465965469251210173287979747997035351091628340272141296933612083671475120986045785815307367821738310652396247484903969639445360386295728333189491379384338527497298295118339867518885532715434158311220114676226496534642131184062305535723227615768711294627855513393071790911051711429217878173579150464051911830713363430920777961449901122761790631840139883140645479892591548938397496129303606658387431934856359524893924257943685880704411975161940635812653904570762635328075766342889477636812712082967276096645112570095379485090789966544362066685516305700949538187361145593959120443750408501533983556576085887714752302766688622163886954107911560988541149555375825048610612017009786270628693920083648580732015747694470201807051840386366858872674696096255634564127845840297976737058662030614795684505386000031040246391214126804834567797505430276955731101768493307983487385710199253081752756361727619584894669343202686789446538045770474070901262009364233676503151870214385140387890301016567002239682587157436725266104979531284174384167142920798376010425002634941836288812274018099923431703924867259456709377705124690336476781467128615384683055607731411568306698630466081827202682601366554233372068920008200107860040203241511099595512622297916728402128589807050158343862332347853623742178598291353287902046586597337716466286879745911902622513927327490423674705107189722333680493870562369179657949212873549977328059803441611034544949958503068348804878965235754915898393042129761100247480982722955535523817882241619685156112793111296170152732168353702771611572347992750469260307432720446041583590485849030153982076843274019866293915805067936271275847816915458347296643814370067473309799854451988237263653592740216951881268833227554085943675287189105409395027084856120299545336625526565507844850721054025236566673896864678754887834782016520554633031415095761510360738963371981328186030910547896529532672047924348576671125279694841252437083396333125041127458589065603591769301007724252836276148113484882491519562944496201143119891108938568917580142698921478827046427164793835509926862316092672550010859073824848155584220834
+ 
+</pre>
+<p class="footer">
+<br>
+<a href="https://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2023b</a>
+<br>
+</p>
+</div>
+<!--
+##### SOURCE BEGIN #####
+% SPDX-License-Identifier: GPL-3.0-or-later
+%
+% ECE210 assignment08.m REPLACE_WITH_DASH_DASH Under Pressure
+% Copyright (C) 2024 Aidan Cusa <aidancusa@gmail.com>
+
+clc;    % clear command window
+clear;  % clear all variables from current worwkspace
+close all; 
+
+%% part 1
+syms Ic Vbe Vt Ae q Dn ni Nb Wb;
+
+Is = Ae * q * Dn * ni^2 / (Nb * Wb);
+eq = Ic == Is * exp(Vbe / Vt);
+
+solve(eq, Ae)
+
+
+%% part 2
+syms Vs(t) R C Vc(t);
+
+eq = Vs(t) == R * C * diff(Vc, t) + Vc(t);
+dsolve(eq)
+
+
+%% part 3
+mu0 = sym(4 * 1e-7);
+mu0_f = vpa(mu0 * pi, floor(1000 * pi))
+
+##### SOURCE END #####
+-->
+</body>
+</html>

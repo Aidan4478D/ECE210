@@ -1,0 +1,575 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<META http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      -->
+<title>problem_set9</title>
+<meta name="generator" content="MATLAB 23.2">
+<link rel="schema.DC" href="http://purl.org/dc/elements/1.1/">
+<meta name="DC.date" content="2024-05-01">
+<meta name="DC.source" content="problem_set9.m">
+<style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; }
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+span.typesection { color:#A0522D }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style>
+</head>
+<body>
+<div class="content">
+<h2>Contents</h2>
+<div>
+<ul>
+<li>
+<a href="#2">Question 1 Part A</a>
+</li>
+<li>
+<a href="#3">Question 1 Part B</a>
+</li>
+<li>
+<a href="#4">Question 2 Part A</a>
+</li>
+<li>
+<a href="#5">Question 2 Part B</a>
+</li>
+<li>
+<a href="#6">Question 2 Part C</a>
+</li>
+<li>
+<a href="#7">Question 2 Part D</a>
+</li>
+</ul>
+</div>
+<pre class="codeinput">
+<span class="comment">% SPDX-License-Identifier: GPL-3.0-or-later</span>
+<span class="comment">%</span>
+<span class="comment">% ECE211 problem_set09.m</span>
+<span class="comment">% Copyright (C) 2024 Aidan Cusa &lt;aidancusa@gmail.com&gt;</span>
+
+clc;    <span class="comment">% clear command window</span>
+clear;  <span class="comment">% clear all variables from current worwkspace</span>
+close <span class="string">all</span>;
+</pre>
+<h2 id="2">Question 1 Part A</h2>
+<pre class="codeinput">N = 1e6;
+v = 5; <span class="comment">% degrees of freedom</span>
+alpha = 0.544;
+
+<span class="comment">% gaussian distribution</span>
+gaussian = randn(N, 1);
+
+<span class="comment">% t-distribution</span>
+t = trnd(v, N, 1);
+k = 1 / sqrt((v / (v - 2))); <span class="comment">% scaling factor</span>
+t_scaled = t * k;
+
+<span class="comment">% cauchy distribution</span>
+U = rand(N, 1);
+cauchy = alpha * tan(pi * U);
+
+<span class="comment">% fraction of time absolute value &lt; 1</span>
+frac_gaussian = sum(abs(gaussian) &lt; 1) / N
+frac_t_scaled = sum(abs(t_scaled) &lt; 1) / N
+frac_cauchy = sum(abs(cauchy) &lt; 1) / N
+
+figure;
+histogram(gaussian);
+hold <span class="string">on</span>;
+xline(1,<span class="string">'--'</span>);
+xline(-1, <span class="string">'--'</span>);
+title(<span class="string">'Gaussian Distribution'</span>);
+xlabel(<span class="string">'Value'</span>);
+ylabel(<span class="string">'Probability Density'</span>);
+
+figure;
+histogram(t_scaled);
+hold <span class="string">on</span>;
+xline(1, <span class="string">'--'</span>);
+xline(-1, <span class="string">'--'</span>);
+title(<span class="string">"Scaled t-Distribution"</span>);
+xlabel(<span class="string">'Value'</span>);
+ylabel(<span class="string">'Probability Density'</span>);
+
+figure;
+histogram(cauchy);
+hold <span class="string">on</span>;
+xline(1, <span class="string">'--'</span>);
+xline(-1, <span class="string">'--'</span>);
+title(<span class="string">'Cauchy Distribution'</span>);
+xlabel(<span class="string">'Value'</span>);
+ylabel(<span class="string">'Probability Density'</span>);
+</pre>
+<pre class="codeoutput">
+frac_gaussian =
+
+    0.6831
+
+
+frac_t_scaled =
+
+    0.7470
+
+
+frac_cauchy =
+
+    0.6821
+
+</pre>
+<img vspace="5" hspace="5" src="problem_set9_01.png" alt=""> <img vspace="5" hspace="5" src="problem_set9_02.png" alt=""> <img vspace="5" hspace="5" src="problem_set9_03.png" alt=""> <h2 id="3">Question 1 Part B</h2>
+<pre class="codeinput">l = 1e5;
+seg_n = N / l;
+re_gaussian = reshape(gaussian, [l, seg_n]);
+re_t_scaled = reshape(t_scaled, [l, seg_n]);
+re_cauchy = reshape(cauchy, [l, seg_n]);
+
+u_gaussian = mean(re_gaussian)
+u_t_scaled = mean(re_t_scaled)
+u_cauchy = mean(re_cauchy)
+
+<span class="comment">% due to the heavy tails of the cauchy distribution, the cauchy mean is not</span>
+<span class="comment">% defined, thus it is not reasonable to say the cauchy mean is equal to 0.</span>
+</pre>
+<pre class="codeoutput">
+u_gaussian =
+
+  Columns 1 through 7
+
+    0.0006   -0.0023    0.0052   -0.0028   -0.0043   -0.0008   -0.0027
+
+  Columns 8 through 10
+
+   -0.0015    0.0010    0.0006
+
+
+u_t_scaled =
+
+  Columns 1 through 7
+
+    0.0033   -0.0051   -0.0022   -0.0048   -0.0012    0.0060    0.0036
+
+  Columns 8 through 10
+
+   -0.0019    0.0002   -0.0024
+
+
+u_cauchy =
+
+  Columns 1 through 7
+
+    0.3738    0.9644    1.1527   -0.5195    0.6371    0.2833    3.2357
+
+  Columns 8 through 10
+
+    0.1908   -2.0014    0.0662
+
+</pre>
+<h2 id="4">Question 2 Part A</h2>
+<pre class="codeinput">
+<span class="comment">% 1. model is ARMA(2, 2)</span>
+<span class="comment">% 2. innovations filter</span>
+<span class="comment">% 3. v[n] = x[n] - 0.4v[n-1] - 0.2v[n-2] - 1.6x[n-1] + 0.81x[n-2]</span>
+<span class="comment">%</span>
+<span class="comment">% 4. A(z) = 1 - 1.6z^-1 + 0.81z^-2</span>
+<span class="comment">%    B(z) = 1 + 0.4z^-1 + 0.2z^-2</span>
+<span class="comment">%    H(z) = B(z) / A(z)</span>
+<span class="comment">%         = (1 + 0.4z^-1 + 0.2z^-2) / (1 - 1.6z^-1 + 0.81z^-2)</span>
+<span class="comment">%</span>
+<span class="comment">% 5. Sx(w) = var^2 / |H(w)|^2</span>
+<span class="comment">%          = 2 * |(1 - 1.6(e^(jw))^-1) + 0.81(e^(jw))^-2) /</span>
+<span class="comment">%                 (1 + 0.4(e^(jw))^-1) + 0.2(e^(jw))^-2)|^2</span>
+
+<span class="comment">% part 6</span>
+num = [1, 0.4, 0.2];
+den = [1, -1.6, 0.81];
+
+[z,p,k] = tf2zp(num, den);
+
+figure;
+zplane(num, den);
+title(<span class="string">'Zero-poles of H(z)'</span>);
+<span class="comment">% since all zeros and poles are within the unit circle, H is the minimum-phase</span>
+</pre>
+<img vspace="5" hspace="5" src="problem_set9_04.png" alt=""> <img vspace="5" hspace="5" src="problem_set9_05.png" alt=""> <h2 id="5">Question 2 Part B</h2>
+<pre class="codeinput">
+<span class="comment">% a</span>
+N = 1e4;
+v = sqrt(2) * randn(N, 1);
+x = filter(num, den, v);
+
+<span class="comment">% b - time averaging to estimate rx</span>
+rx = zeros(7,1);
+<span class="keyword">for</span> m = 0:6
+    rx(m + 1) = dot(x(1:N-m), x(m+1:N)) / (N - m);
+<span class="keyword">end</span>
+
+<span class="comment">% c - stem plot of rx</span>
+<span class="comment">% since rx(m) = rx(-m)</span>
+rx_complete = [flipud(rx(2:end)); rx];
+
+figure;
+stem(-6:6, rx_complete);
+title(<span class="string">'Correlation'</span>);
+
+<span class="comment">% d - 7x7 Toeplitz matrix R</span>
+R_toe = toeplitz(rx)
+
+<span class="comment">% e - eigenvalues of R</span>
+[eigvec, eigval0] = eig(R_toe);
+[eigval, idx] = sort(diag(eigval0),<span class="string">'descend'</span>);
+
+pos_def = all(eigval(:)&gt;0)
+<span class="comment">% since all eigenvalues are &gt; 0, R is positive definite</span>
+
+<span class="comment">% f - estimate 6x6 correlation matrix R</span>
+X = toeplitz(x, zeros(1, 7));
+
+<span class="comment">% correlation matrix R</span>
+R_corr = (X' * X) / N
+</pre>
+<pre class="codeoutput">
+R_toe =
+
+   61.1404   55.0563   39.1752   18.2184   -2.5595  -18.9428  -28.3937
+   55.0563   61.1404   55.0563   39.1752   18.2184   -2.5595  -18.9428
+   39.1752   55.0563   61.1404   55.0563   39.1752   18.2184   -2.5595
+   18.2184   39.1752   55.0563   61.1404   55.0563   39.1752   18.2184
+   -2.5595   18.2184   39.1752   55.0563   61.1404   55.0563   39.1752
+  -18.9428   -2.5595   18.2184   39.1752   55.0563   61.1404   55.0563
+  -28.3937  -18.9428   -2.5595   18.2184   39.1752   55.0563   61.1404
+
+
+pos_def =
+
+  logical
+
+   1
+
+Warning: First element of input column does not match first element of input
+row.
+         Column wins diagonal conflict. 
+
+R_corr =
+
+   61.1404   55.0508   39.1674   18.2130   -2.5585  -18.9334  -28.3766
+   55.0508   61.1362   55.0447   39.1622   18.2098   -2.5602  -18.9348
+   39.1674   55.0447   61.1271   55.0370   39.1574   18.2073   -2.5623
+   18.2130   39.1622   55.0370   61.1206   55.0329   39.1553   18.2055
+   -2.5585   18.2098   39.1574   55.0329   61.1181   55.0316   39.1542
+  -18.9334   -2.5602   18.2073   39.1553   55.0316   61.1174   55.0311
+  -28.3766  -18.9348   -2.5623   18.2055   39.1542   55.0311   61.1170
+
+</pre>
+<img vspace="5" hspace="5" src="problem_set9_06.png" alt=""> <img vspace="5" hspace="5" src="problem_set9_07.png" alt=""> <h2 id="6">Question 2 Part C</h2>
+<pre class="codeinput">
+<span class="comment">% a</span>
+[s_est, w] = pwelch(x, hamming(512), 256, 512);
+
+figure;
+plot(w,s_est);
+title(<span class="string">"Estimated PSD"</span>);
+xlabel(<span class="string">'Frequency'</span>)
+ylabel(<span class="string">'PSD'</span>)
+
+<span class="comment">% b - peak of PSD estimate at frequency w0 in rad</span>
+[peak, i] = max(s_est);
+w0 = w(i)
+
+<span class="comment">% c - pole angle</span>
+pole_angle = abs(angle(p))
+
+<span class="comment">% the pole angle is super close to w0</span>
+</pre>
+<pre class="codeoutput">
+w0 =
+
+    0.4172
+
+
+pole_angle =
+
+    0.4759
+    0.4759
+
+</pre>
+<img vspace="5" hspace="5" src="problem_set9_08.png" alt=""> <img vspace="5" hspace="5" src="problem_set9_09.png" alt=""> <h2 id="7">Question 2 Part D</h2>
+<pre class="codeinput">[a, varv] = aryule(x, 4);
+
+x0 = filter(1, a, v);
+
+rx0 = zeros(7, 1);
+<span class="keyword">for</span> m = 0:6
+    rx0(m + 1) = dot(x0(1:N-m), x0(m+1:N)) / (N - m);
+<span class="keyword">end</span>
+
+rx0_complete = [flipud(rx0(2:end)); rx0];
+
+figure;
+stem(-6:6, rx0_complete);
+title(<span class="string">'Correlation (Part D)'</span>);
+
+figure;
+hold <span class="string">on</span>;
+stem(1:100, x(1:100));
+stem(1:100, x0(1:100));
+legend(<span class="string">'AR Innovations Signal'</span>, <span class="string">'Original signal'</span>);
+title(<span class="string">'Part D Stem Plot of x0 and x'</span>);
+
+<span class="comment">% plots do not match!</span>
+</pre>
+<img vspace="5" hspace="5" src="problem_set9_10.png" alt=""> <img vspace="5" hspace="5" src="problem_set9_11.png" alt=""> <img vspace="5" hspace="5" src="problem_set9_12.png" alt=""> <p class="footer">
+<br>
+<a href="https://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2023b</a>
+<br>
+</p>
+</div>
+<!--
+##### SOURCE BEGIN #####
+% SPDX-License-Identifier: GPL-3.0-or-later
+%
+% ECE211 problem_set09.m
+% Copyright (C) 2024 Aidan Cusa <aidancusa@gmail.com>
+
+clc;    % clear command window
+clear;  % clear all variables from current worwkspace
+close all;
+
+%% Question 1 Part A
+N = 1e6;
+v = 5; % degrees of freedom
+alpha = 0.544;
+
+% gaussian distribution
+gaussian = randn(N, 1);
+
+% t-distribution
+t = trnd(v, N, 1);
+k = 1 / sqrt((v / (v - 2))); % scaling factor
+t_scaled = t * k; 
+
+% cauchy distribution
+U = rand(N, 1);
+cauchy = alpha * tan(pi * U);
+
+% fraction of time absolute value < 1
+frac_gaussian = sum(abs(gaussian) < 1) / N
+frac_t_scaled = sum(abs(t_scaled) < 1) / N
+frac_cauchy = sum(abs(cauchy) < 1) / N
+
+figure;
+histogram(gaussian);
+hold on;
+xline(1,'REPLACE_WITH_DASH_DASH');
+xline(-1, 'REPLACE_WITH_DASH_DASH');
+title('Gaussian Distribution');
+xlabel('Value');
+ylabel('Probability Density');
+
+figure;
+histogram(t_scaled);
+hold on;
+xline(1, 'REPLACE_WITH_DASH_DASH');
+xline(-1, 'REPLACE_WITH_DASH_DASH');
+title("Scaled t-Distribution");
+xlabel('Value');
+ylabel('Probability Density');
+
+figure;
+histogram(cauchy);
+hold on;
+xline(1, 'REPLACE_WITH_DASH_DASH');
+xline(-1, 'REPLACE_WITH_DASH_DASH');
+title('Cauchy Distribution');
+xlabel('Value');
+ylabel('Probability Density');
+
+
+%% Question 1 Part B
+l = 1e5;
+seg_n = N / l;
+re_gaussian = reshape(gaussian, [l, seg_n]);
+re_t_scaled = reshape(t_scaled, [l, seg_n]);
+re_cauchy = reshape(cauchy, [l, seg_n]);
+
+u_gaussian = mean(re_gaussian)
+u_t_scaled = mean(re_t_scaled)
+u_cauchy = mean(re_cauchy)
+
+% due to the heavy tails of the cauchy distribution, the cauchy mean is not
+% defined, thus it is not reasonable to say the cauchy mean is equal to 0. 
+
+
+%% Question 2 Part A
+
+% 1. model is ARMA(2, 2)
+% 2. innovations filter
+% 3. v[n] = x[n] - 0.4v[n-1] - 0.2v[n-2] - 1.6x[n-1] + 0.81x[n-2]
+%
+% 4. A(z) = 1 - 1.6z^-1 + 0.81z^-2
+%    B(z) = 1 + 0.4z^-1 + 0.2z^-2
+%    H(z) = B(z) / A(z)
+%         = (1 + 0.4z^-1 + 0.2z^-2) / (1 - 1.6z^-1 + 0.81z^-2)
+%
+% 5. Sx(w) = var^2 / |H(w)|^2 
+%          = 2 * |(1 - 1.6(e^(jw))^-1) + 0.81(e^(jw))^-2) /
+%                 (1 + 0.4(e^(jw))^-1) + 0.2(e^(jw))^-2)|^2
+
+% part 6
+num = [1, 0.4, 0.2];
+den = [1, -1.6, 0.81];
+
+[z,p,k] = tf2zp(num, den);
+
+figure;
+zplane(num, den);
+title('Zero-poles of H(z)');
+% since all zeros and poles are within the unit circle, H is the minimum-phase
+
+
+%% Question 2 Part B
+
+% a
+N = 1e4;
+v = sqrt(2) * randn(N, 1);
+x = filter(num, den, v);
+
+% b - time averaging to estimate rx
+rx = zeros(7,1);
+for m = 0:6
+    rx(m + 1) = dot(x(1:N-m), x(m+1:N)) / (N - m);
+end
+
+% c - stem plot of rx
+% since rx(m) = rx(-m)
+rx_complete = [flipud(rx(2:end)); rx];
+
+figure;
+stem(-6:6, rx_complete);
+title('Correlation');
+
+% d - 7x7 Toeplitz matrix R
+R_toe = toeplitz(rx)
+
+% e - eigenvalues of R
+[eigvec, eigval0] = eig(R_toe);
+[eigval, idx] = sort(diag(eigval0),'descend');
+
+pos_def = all(eigval(:)>0)
+% since all eigenvalues are > 0, R is positive definite
+
+% f - estimate 6x6 correlation matrix R
+X = toeplitz(x, zeros(1, 7));
+
+% correlation matrix R
+R_corr = (X' * X) / N
+
+
+%% Question 2 Part C
+
+% a
+[s_est, w] = pwelch(x, hamming(512), 256, 512);
+
+figure;
+plot(w,s_est);
+title("Estimated PSD");
+xlabel('Frequency')
+ylabel('PSD')
+
+% b - peak of PSD estimate at frequency w0 in rad
+[peak, i] = max(s_est);
+w0 = w(i)
+
+% c - pole angle
+pole_angle = abs(angle(p))
+
+% the pole angle is super close to w0
+
+
+%% Question 2 Part D
+[a, varv] = aryule(x, 4);
+
+x0 = filter(1, a, v);
+
+rx0 = zeros(7, 1); 
+for m = 0:6
+    rx0(m + 1) = dot(x0(1:N-m), x0(m+1:N)) / (N - m);
+end
+
+rx0_complete = [flipud(rx0(2:end)); rx0];
+
+figure;
+stem(-6:6, rx0_complete);
+title('Correlation (Part D)');
+
+figure;
+hold on;
+stem(1:100, x(1:100));
+stem(1:100, x0(1:100));
+legend('AR Innovations Signal', 'Original signal');
+title('Part D Stem Plot of x0 and x');
+
+% plots do not match!
+
+
+##### SOURCE END #####
+-->
+</body>
+</html>

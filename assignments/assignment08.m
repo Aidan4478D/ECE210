@@ -1,6 +1,6 @@
 % SPDX-License-Identifier: GPL-3.0-or-later
 %
-% ECE210 assignment08.m -- Under Pressure
+% ECE210 assignment08.m -- Must Be Easy
 % Copyright (C) 2024 Aidan Cusa <aidancusa@gmail.com>
 
 clc;    % clear command window
