@@ -1,0 +1,89 @@
+clear; close all; clc;
+
+%% Parameters
+filename = 'bjruf.wav'; % Replace with your actual filename
+
+[x, fs] = audioread(filename);
+x = x(:)'; % Ensure row vector
+
+% Block parameters
+N = 1000;      % FFT size
+L = N;      % Window length (often chosen equal to N for simplicity)
+R = N/5;       % Hop size (R <= L <= N)
+numBlocks = ceil(length(x)/R);
+
+% Zero-pad the input signal to accommodate the last partial block
+x = [x zeros(1, (numBlocks*R + L - R) - length(x))];
+
+% Choose window: rectangular or Bartlett
+% w = rectwin(L)';
+w = bartlett(L)'; 
+
+% Initialize storage
+X_r = zeros(numBlocks, N);  % Frequency domain representation per block
+speech_presence = zeros(numBlocks, 1);
+
+%% Forward transform (Eqn 10.43)
+for r = 1:numBlocks
+    start_idx = (r-1)*R + 1;
+    seg = x(start_idx:start_idx+L-1) .* w;
+    X_block = fft(seg, N);
+    X_r(r,:) = X_block;
+end
+
+%% Speech Detection Heuristic
+% A simple heuristic: measure energy in frequency domain and threshold it.
+block_energies = sum(abs(X_r).^2, 2);
+energy_threshold = 0.1 * max(block_energies);
+speech_presence(block_energies > energy_threshold) = 1;
+
+%% Reconstruction via Overlap-Add (Eqn 10.44)
+x_hat = zeros(1, numBlocks*R + L - R);
+
+for r = 1:numBlocks
+    % Inverse transform
+    x_r_block = ifft(X_r(r,:), N);
+    x_r_block = real(x_r_block(1:L)) .* w;  % Windowed time-domain block
+    start_idx = (r-1)*R + 1;
+    x_hat(start_idx:start_idx+L-1) = x_hat(start_idx:start_idx+L-1) + x_r_block;
+end
+
+% Trim to original length
+x_hat = x_hat(1:length(x));
+
+%% Verify reconstruction quality
+reconstruction_error = norm(x_hat - x) / norm(x);
+disp(['Reconstruction error: ' num2str(reconstruction_error)]);
+
+%% Create a 0-1 vector aligned with the original signal for visualization
+speech_binary = zeros(size(x));
+for r = 1:numBlocks
+    start_idx = (r-1)*R + 1;
+    end_idx = start_idx + L - 1;
+    if end_idx > length(speech_binary)
+        end_idx = length(speech_binary);
+    end
+    speech_binary(start_idx:end_idx) = speech_presence(r);
+end
+
+%% Plot results
+t = (0:length(x)-1)/fs;
+figure;
+subplot(2,1,1);
+plot(t, x);
+xlabel('Time (s)');
+ylabel('Amplitude');
+title('Original Audio Signal');
+
+subplot(2,1,2);
+plot(t, speech_binary, 'r');
+xlabel('Time (s)');
+ylabel('Speech Activity');
+title('Detected Speech Activity (1=Speech, 0=No Speech)');
+ylim([-0.1 1.1]);
+
+%% Play the reconstructed sound
+% soundsc normalizes the audio for playback without distortion.
+soundsc(x_hat, fs);
+pause(10);          % Wait for 20 seconds
+clear sound;        % Stop the sound

@@ -1,0 +1,191 @@
+% SPDX-License-Identifier: GPL-3.0-or-later
+%
+% ECE310 Digital Signal Processing - Problem Set 1
+% Copyright (C) 2024 Aidan Cusa <aidancusa@gmail.com>, Kristof Jablonowski,
+% Noam Schuck
+
+[x, Fs_original] = audioread('wagner.wav');
+
+% Perform sampling rate conversion
+y = srconvert(x);
+
+% Normalize output to prevent clipping
+y = y / max(abs(y));
+
+% Write the output file
+audiowrite('wagner_24k.wav', y, 24000);
+
+% Display completion message
+disp('Conversion complete. Output saved as wagner_24k.wav');
+
+y2 = srconvert([1 zeros(1, 3000)]);
+figure(11)
+verify(y2, "Zeros")
+
+
+% Local functions below
+function E = polyphase(h, M)
+    h = [h zeros(1, ceil(length(h)/M)*M-length(h))];
+    E = reshape(h, M, length(h)/M);
+end
+
+function y=db20(x)
+    
+    y=20*log10(abs(x));
+    return;
+end 
+
+function h = design_filter(Fs, Fpass, Fstop, Apass, Astop)
+    d = fdesign.lowpass('Fp,Fst,Ap,Ast', Fpass, Fstop, Apass, Astop, Fs);
+    Hd = design(d, 'equiripple');
+    h = Hd.Numerator;
+end
+
+function y = upsample_polyphase(x, E)
+    L = size(E, 1);
+    y = zeros(1, L * length(x));
+    for i = 1:L
+        y(i:L:end) = conv(x, E(i,:), 'same');
+    end
+end
+
+function y = downsample_polyphase(x, E)
+    M = size(E, 1);
+    y = zeros(1, ceil(length(x) / M));
+    for i = 1:M
+        conv_result = conv(x(i:M:end), E(i,:), 'same');
+        % Only add elements that fit into y
+        overlap_len = min(length(y), length(conv_result)); 
+        y(1:overlap_len) = y(1:overlap_len) + conv_result(1:overlap_len);
+    end
+end
+
+function y = srconvert(x)
+    % 5x upsampling
+    h_5x = design_filter(55125, 5000, 5512.5, 0.05, 80);
+    E_5x = polyphase(h_5x, 5);
+    y = upsample_polyphase(x, E_5x);
+    
+    % Verify the 5x upsampling filter
+    figure(1);
+    verify(h_5x, '5x Upsampling Filter');
+
+    % Six 2x upsampling stages
+    for i = 1:6
+        Fs = 55125 * 2^i;
+        h_2x = design_filter(Fs, Fs/4, Fs/2, 0.05, 80);
+        E_2x = polyphase(h_2x, 2);
+        y = upsample_polyphase(y, E_2x);
+        
+        % Verify each 2x upsampling filter
+        figure(i+1);
+        verify(h_2x, ['2x Upsampling Filter Stage ' num2str(i)]);
+    end
+    
+    % Two 7x downsampling stages
+    Fs_7x = [1764000, 252000];
+    for i = 1:2
+        h_7x = design_filter(Fs_7x(i), Fs_7x(i)/4, Fs_7x(i)/2, 0.05, 80);
+        E_7x = polyphase(h_7x, 7);
+        y = downsample_polyphase(y, E_7x);
+        
+        % Verify each 7x downsampling filter
+        figure(7+i);
+        verify(h_7x, ['7x Downsampling Filter Stage ' num2str(i)]);
+    end
+    
+    % Final 3x downsampling
+    h_3x = design_filter(72000, 5000, 5500, 0.05, 80);
+    E_3x = polyphase(h_3x, 3);
+    y = downsample_polyphase(y, E_3x);
+    
+    % Verify the 3x downsampling filter
+    figure(10);
+    verify(h_3x, '3x Downsampling Filter');
+end
+
+function yes = verify(h, title_str)
+    [R, G, A] = examlpf(h, 147/320, 147/320*1.2);
+
+    % Passband magnitude
+    yes = R <= 0.1;
+    subplot(3,1,1);
+    if R <= 0.1
+        title([title_str ': Passband Response, Ripple = ' num2str(R) ' dB, OK']);
+    else
+        title([title_str ': Passband Response, Ripple = ' num2str(R) ' dB, too big']);
+    end
+
+    % Group delay
+    subplot(3,1,2);
+    if G <= 720
+        title([title_str ': Group Delay in Passband, max-min = ' num2str(G) ', OK']);
+    else
+        title([title_str ': Group Delay in Passband, max-min = ' num2str(G) ', too big']);
+    end
+    yes = yes * (G <= 720);
+
+    % Stopband magnitude
+    subplot(3,1,3);
+    if A <= -70
+        title([title_str ': Overall Response, Attenuation = ' num2str(A) ' dB, OK']);
+    else
+        title([title_str ': Overall Response, Attenuation = ' num2str(A) ' dB, too small']);
+    end
+    yes = yes * (A <= -70);
+
+    fprintf('%s:\n', title_str);
+    fprintf('Passband Ripple:       %5.3f dB \n', R);
+    fprintf('Group delay Variation:  %5d samples \n', G);
+    fprintf('Stopband Attenuation:  %5.3f dB \n\n', A);
+end
+
+function [maxripple,gdvariation,atten]=examlpf(h,wp,ws)
+
+% function [R,G,A]=examlpf(h,wp,ws)
+%
+% Plots the DFT of the lowpass filter whose impulse response is h.
+% The arguments wp, and ws denotes the passband and stopband cutoff 
+% frequency normalized by pi.
+% Plot 1: zooms in the passband and measures the ripple size (R).
+% Plot 2: shows group delay in the passband, measuring the difference 
+%         between the max-min in grd (G)
+% Plot 3: shows the entire magnitude frequency response, and measures
+%         the stopband attenuation (A).
+% 
+
+
+fftlength = 1024*8;
+ffth	= db20(fft(h,fftlength));
+
+ind	= round(wp*fftlength/2);
+
+meandb	= mean(ffth(1:ind));
+
+subplot(3,1,1)
+plot((1:ind)/fftlength*2,ffth(1:ind));
+maxripple	= max(abs(ffth(1:ind))-meandb);
+title(['Passband Response,  Ripple = ' num2str(maxripple) ' dB']);
+xlabel('\omega / \pi')
+ylabel('dB')
+
+subplot(3,1,2)
+[gd,w]		= grpdelay(h,1,fftlength/2);
+maxgd		= max(gd(1:ind));
+mingd		= min(gd(1:ind));
+gdvariation	= abs(maxgd-mingd);
+plot(w(1:ind)/pi,gd(1:ind));
+title(['Group Delay in Passband, max-min = ' num2str(gdvariation)])
+xlabel('\omega / \pi');
+ylabel('Samples');
+
+subplot(3,1,3)
+
+atten		= max(ffth(round(ws*fftlength/2):fftlength/2)-meandb);
+plot((1:fftlength)/fftlength*2,ffth)
+title(['Overall Response , Attenuation = ' num2str(atten) ' dB']);
+xlabel('\omega / \pi');
+ylabel('dB')
+
+return
+end
