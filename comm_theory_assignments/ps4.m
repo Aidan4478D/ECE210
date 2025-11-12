@@ -10,7 +10,7 @@ amplitudes = [2, 10, 2];
 bandwidths = [10, 2, 20];
 kf = 2;
 
-n = numel(amplitudes);
+n = length(amplitudes);
 delta_f = zeros(n,1);
 mod_index = zeros(n,1);
 carson_bw = zeros(n,1);
@@ -31,6 +31,38 @@ Summary = table( (1:n).', amplitudes.', delta_f, mod_index, band_type, carson_bw
                  'VariableNames', {'Case','amplitude','delta_f','mod. index','band type','CarsonBW (MHz)','UniversalBW (MHz)'});
 
 disp(Summary);
+
+
+%% Question 3
+fc = 10; % carrier frequency
+Ac = 2; % carrier amplitude
+fm = 2; % message frequency
+ka = 2; % amplitude sensitivity
+fs = 100; % sampling frequency
+t = 0:1/fs:19.99; % time vector for 2000 samples
+
+Am = [0.4, 0.45, 0.6];
+
+for i = 1:length(Am)
+    m_t = Am(i) * cos(2 * pi * fm * t);
+    s_t = Ac * (1 + ka*m_t) .* cos(2 * pi * fc * t);
+
+    mod_index = max(ka * m_t) * 100;
+
+    is_overmod = "not overmodulated";
+    if mod_index > 100
+        is_overmod = "overmodulated";
+    end
+    fprintf("Modulation index is: %d%%, thus the signal is %s\n", mod_index, is_overmod)
+
+    subplot(3, 1, i);
+    plot(t, s_t);
+    title("AM Signal - A_m = " + Am(i))
+    xlabel("Time (s)")
+    ylabel("Amplitude (V)");
+    grid on;
+end
+
 
 function [delta_f, mod_index, band_type, carson_bw] = get_fm_results(kf, amplitude, bandwidth)
     delta_f = kf * amplitude;
