@@ -211,10 +211,158 @@ SNIR_target_lin = 10^(SNIR_target_dB/10);
 
 % SNR = SNIR * SIR0 / (SIR0 - SNIR)
 SNR_required_lin = (SNIR_target_lin * SIR0_lin) / (SIR0_lin - SNIR_target_lin);
-SNR_required_dB  = 10*log10(SNR_required_lin);
+SNR_required_dB = 10*log10(SNR_required_lin);
 
 fprintf("part f:\n\ttarget SNIR = %.4f dB\n", SNIR_target_dB);
 fprintf("\trequired SNR = %.4f dB\n", SNR_required_dB);
+
+
+%% Q7
+
+num_bits = 1e5;
+bits = randi([0, 1], num_bits, 1);
+
+% = reshape(bits, 2, []).';
+
+% 00 -> ( +1 + j)/sqrt(2)
+% 01 -> ( -1 + j)/sqrt(2)
+% 11 -> ( -1 - j)/sqrt(2)
+% 10 -> ( +1 - j)/sqrt(2)
+
+bit_pairs = reshape(bits, 2, []).';
+sym = zeros(size(bit_pairs,1),1);
+
+for n = 1:size(bit_pairs,1)
+    b1 = bit_pairs(n,1); 
+    b2 = bit_pairs(n,2);
+
+    if b1==0 && b2==0
+        sym(n) = ( 1 + 1j)/sqrt(2);
+    elseif b1==0 && b2==1
+        sym(n) = (-1 + 1j)/sqrt(2);
+    elseif b1==1 && b2==1
+        sym(n) = (-1 - 1j)/sqrt(2);
+    elseif b1==1 && b2==0
+        sym(n) = ( 1 - 1j)/sqrt(2);
+    end
+end
+
+% upsample and pulse shape
+sym_up = upsample(sym, sps);
+x = filter(rrc, 1, sym_up);
+
+% plot zoomed envelope so it doesn't look solid
+num_syms_to_plot = 300;
+Nplot = num_syms_to_plot * sps;
+
+figure;
+plot(abs(x(1:Nplot)), 'LineWidth', 1);
+grid on;
+title('Q7(a) Transmitted waveform envelope |x[n]| (first 300 symbols)');
+xlabel('Sample index');
+ylabel('Envelope');
+
+% find average SIR in transmitted waveform
+Lh = length(rrc);
+d_tx = (Lh - 1)/2; % group delay (samples)
+
+idxs = d_tx+1 : sps : length(x);   % valid peak locations in x
+Ns = min(length(sym), length(idxs));  % how many we can actually sample
+
+x_samp = x(idxs(1:Ns));
+sym_use = sym(1:Ns);
+
+% ISI only
+err_tx = x_samp - sym_use;
+
+S_avg = mean(abs(sym_use).^2);
+I_avg = mean(abs(err_tx).^2);
+
+SIR_avg_lin = S_avg / I_avg;
+SIR_avg_dB = 10*log10(SIR_avg_lin);
+
+fprintf("part a:\n\tavg SIR at TX output = %.4f dB\n", SIR_avg_dB);
+
+
+% part B
+snr_lin = 10^(SNR_required_dB/10);
+
+sig_pow = mean(abs(x).^2); % measured signal power
+noise_pow = sig_pow / snr_lin; % total complex noise power
+
+w = sqrt(noise_pow/2) * (randn(size(x)) + 1j*randn(size(x)));
+r = x + w; % noisy received waveform
+
+y = filter(rrc, 1, r); % matched filter output (same length as r)
+
+% Plot zoomed MF envelope (otherwise looks solid)
+num_syms_to_plot = 300;
+Nplot = num_syms_to_plot * sps;
+
+figure;
+plot(abs(y(1:Nplot)), 'LineWidth', 1);
+grid on;
+title('Q7(b) MF output envelope |y[n]| (first 300 symbols)');
+xlabel('Sample index');
+ylabel('Envelope');
+
+% average SNIR at MF output 
+d_tot = span*sps; % total delay after Tx+Rx
+
+idxs_y = d_tot+1 : sps : length(y); % valid peak locations in y
+Ns_y = min(length(sym), length(idxs_y));
+
+y_samp = y(idxs_y(1:Ns_y));
+sym_use = sym(1:Ns_y);
+
+% ISI + noise
+err_mf = y_samp - sym_use;
+
+S_avg = mean(abs(sym_use).^2);
+IN_avg = mean(abs(err_mf).^2);
+
+SNIR_avg_lin = S_avg / IN_avg;
+SNIR_avg_dB = 10*log10(SNIR_avg_lin);
+
+fprintf("part b:\n\tavg SNIR at MF output = %.4f dB\n", SNIR_avg_dB);
+%fprintf("\tused %d symbol samples (out of %d)\n", Ns_y, length(sym));
+
+
+% part C: decode symbols, SER and BER
+const = [ ( 1+1j) (-1+1j) (-1-1j) ( 1-1j) ]/sqrt(2);
+
+% inverse Gray map aligned to "const" order above
+bits_table = [0 0;   % for const(1)
+              0 1;   % for const(2)
+              1 1;   % for const(3)
+              1 0];  % for const(4)
+
+dec_sym  = zeros(Ns_y,1);
+dec_bits = zeros(2*Ns_y,1);
+
+for n = 1:Ns_y
+    % nearest neighbor decision
+    [~,k] = min(abs(y_samp(n) - const));
+    dec_sym(n) = const(k);
+
+    % write decoded dibits
+    dec_bits(2*n-1:2*n) = bits_table(k,:).';
+end
+
+% symbol error rate 
+sym_errs = sum(dec_sym ~= sym_use);
+SER = sym_errs / Ns_y;
+
+% bit error rate 
+% Only compare bits that correspond to the Ns_y decoded symbols
+bits_use = bits(1:2*Ns_y);
+bit_errs = sum(dec_bits ~= bits_use);
+BER = bit_errs / (2*Ns_y);
+
+fprintf("part c:\n\t# symbol errors = %d / %d\n", sym_errs, Ns_y);
+fprintf("\tSER estimate = %.6e\n", SER);
+fprintf("\t# bit errors = %d / %d\n", bit_errs, 2*Ns_y);
+fprintf("\tBER estimate = %.6e\n", BER);
 
 
 % idk why but my MATLAB is not having it with "qfunc" so I just made my own
