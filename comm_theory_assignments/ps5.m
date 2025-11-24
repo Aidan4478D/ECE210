@@ -131,6 +131,90 @@ fprintf("\nQuestion 4\npart d:\n")
 fprintf("\tSIR (dB) = %f\n", SIR_dB);
 fprintf("\tSNIR (dB) = %f\n", SNIR_dB);
 
+%% Q6
+fprintf("\nQuestion 6\n")
+R_s = 48e3; % symbol rate
+beta = 0.2; % rolloff
+sps = 16; % samples per sym
+
+% part a
+bandwidth = (1 + beta) * R_s / 2;
+fprintf("part a:\n\tbandwidth=%f\n", 2 * bandwidth); % 2x for two-sided bandwidth
+
+% part b
+fs_digital = sps * R_s;
+fprintf("part b:\n\tdigital sampling rate=%f\n", fs_digital);
+
+% part c
+bit_rate = 2 * R_s; % QPSK = log2(4) = 2 bits/sym
+fprintf("part c:\n\tbit rate=%f\n", bit_rate);
+
+% part d
+span = 3;
+
+rrc = rcosdesign(beta, span, sps, 'sqrt');
+mf = conv(rrc, fliplr(rrc));  % matched filter output
+
+% plot pulse shapes
+figure('Position', [100, 100, 1200, 400]);
+subplot(2,1,1);
+stem(rrc, 'filled', 'MarkerSize', 3);
+grid on;
+title('Transmit RRC Pulse Shape');
+xlabel('Sample Index');
+ylabel('Amplitude');
+
+subplot(2,1,2);
+stem(mf, 'filled', 'MarkerSize', 3);
+grid on;
+title('Matched Filter Output');
+xlabel('Sample Index');
+ylabel('Amplitude');
+
+% part e 
+
+% get peak index
+[~, center_idx] = max(abs(mf));
+
+% get samples around peak
+m_range = -span:span;
+gd = zeros(size(m_range));
+for idx = 1:length(m_range)
+    m = m_range(idx);
+    gd(idx) = mf(center_idx + m*sps);
+end
+
+%display(gd)
+
+% normalize so gd[0] = 1
+gd0 = gd(m_range==0);
+gd = gd / gd0;
+
+A_max = 1;  % QPSK symbols have unit magnitude
+I = 0;
+for i = 1:length(m_range)
+    if m_range(i) ~= 0
+        I = I + A_max * abs(gd(i));
+    end
+end
+
+signal_power = (A_max)^2;
+SIR0_dB = 10*log10(signal_power / I^2);
+
+fprintf("part e:\n\tSIR0 = %.4f dB\n", SIR0_dB);
+
+% part f
+SIR0_lin = 10^(SIR0_dB/10);
+
+SNIR_target_dB  = SIR0_dB - 5;
+SNIR_target_lin = 10^(SNIR_target_dB/10);
+
+% SNR = SNIR * SIR0 / (SIR0 - SNIR)
+SNR_required_lin = (SNIR_target_lin * SIR0_lin) / (SIR0_lin - SNIR_target_lin);
+SNR_required_dB  = 10*log10(SNR_required_lin);
+
+fprintf("part f:\n\ttarget SNIR = %.4f dB\n", SNIR_target_dB);
+fprintf("\trequired SNR = %.4f dB\n", SNR_required_dB);
 
 
 % idk why but my MATLAB is not having it with "qfunc" so I just made my own
