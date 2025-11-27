@@ -14,18 +14,15 @@ gamma = 10^(snr / 10);
 BER_orth = qfunc(sqrt(gamma));
 
 % lowest BER case => p=-0.217
-BER_low = qfunc(sqrt((1 - 0.217) * gamma));
+BER_low = qfunc(sqrt((1 - (-0.217)) * gamma));
 
 fprintf("Question 1:\n\tOrthogonal case: %f\n", BER_orth);
 fprintf("\tLowest BER case: %f\n", BER_low);
 
 % part B
-% non-coherent detection, equation from chart on deck 04 slide 17
-BER_noncoh_orth = 0.5 * exp(-gamma/2);
-fprintf('\tnoncoherent orthogonal BER: %.6e\n\n', BER_noncoh_orth);
-
-% need to find BER for noncoherent detection for optimal case
-
+% values based on inspection from the chart in the slides
+fprintf('\tnoncoherent orthogonal BER: 0.2\n');
+fprintf('\tnoncoherent lowest BER: 0.02\n');
 
 %% Q2
 
@@ -91,12 +88,12 @@ pe_simplified = zeros(size(gamma_b_lin));
 for idx = 1:length(gamma_b_lin)
     gb = gamma_b_lin(idx);
 
-    % Detailed union bound
+    % detailed union bound
     for k = 1:length(a_k)
         pe_detailed(idx) = pe_detailed(idx) + a_k(k) * qfunc(sqrt(b_k(k) * gb));
     end
 
-    % Simplified (dominant term with d_min only)
+    % simplified (dominant term with d_min only)
     pe_simplified(idx) = get_pe_estimate(gb);
 end
 
@@ -110,7 +107,7 @@ xlabel('\gamma_b (dB/bit)');
 ylabel('p_e');
 title('8-Point Constellation - Symbol Error Probability');
 legend('Detailed Union Bound', 'Simplified (d_{min} only)');
-ylim([1e-6 1e-2]);
+xlim([1 20]);
 
 
 %% Q4
@@ -125,6 +122,8 @@ I_worst = 0.12; % 0.06 + 0.04 + 0.02
 SIR_dB = 10 * log10 (signal_power / I_worst^2);
 
 noise_power = signal_power / snr_linear;
+% display(noise_power)
+
 SNIR_dB = 10 * log10 (signal_power / (I_worst^2 + noise_power));
 
 fprintf("\nQuestion 4\npart d:\n")
@@ -138,8 +137,8 @@ beta = 0.2; % rolloff
 sps = 16; % samples per sym
 
 % part a
-bandwidth = (1 + beta) * R_s / 2;
-fprintf("part a:\n\tbandwidth=%f\n", 2 * bandwidth); % 2x for two-sided bandwidth
+bandwidth = (1 + beta) * R_s / 2; % (one sided bandwidth)
+fprintf("part a:\n\tbandwidth=%f\n", bandwidth);
 
 % part b
 fs_digital = sps * R_s;
@@ -153,7 +152,9 @@ fprintf("part c:\n\tbit rate=%f\n", bit_rate);
 span = 3;
 
 rrc = rcosdesign(beta, span, sps, 'sqrt');
-mf = conv(rrc, fliplr(rrc));  % matched filter output
+mf = rrc; % mf = transmit filter for rrc
+
+rrc_conv = conv(rrc, mf);  % matched filter output
 
 % plot pulse shapes
 figure('Position', [100, 100, 1200, 400]);
@@ -165,42 +166,35 @@ xlabel('Sample Index');
 ylabel('Amplitude');
 
 subplot(2,1,2);
-stem(mf, 'filled', 'MarkerSize', 3);
+stem(rrc_conv, 'filled', 'MarkerSize', 3);
 grid on;
 title('Matched Filter Output');
 xlabel('Sample Index');
 ylabel('Amplitude');
 
-% part e 
-
+% part e
 % get peak index
-[~, center_idx] = max(abs(mf));
+[~, center_idx] = max(abs(rrc_conv));
 
 % get samples around peak
 m_range = -span:span;
 gd = zeros(size(m_range));
 for idx = 1:length(m_range)
     m = m_range(idx);
-    gd(idx) = mf(center_idx + m*sps);
+    gd(idx) = rrc_conv(center_idx + m*sps);
 end
 
 %display(gd)
 
-% normalize so gd[0] = 1
-gd0 = gd(m_range==0);
-gd = gd / gd0;
+% find the center sample
+gd0 = gd(m_range == 0);
 
-A_max = 1;  % QPSK symbols have unit magnitude
-I = 0;
-for i = 1:length(m_range)
-    if m_range(i) ~= 0
-        I = I + A_max * abs(gd(i));
-    end
-end
+A_max = 1;
+signal_power = abs(gd0)^2;
 
-signal_power = (A_max)^2;
-SIR0_dB = 10*log10(signal_power / I^2);
-
+I = A_max * sum(abs(gd(m_range ~= 0)));
+SIR0_linear = signal_power / (I^2);
+SIR0_dB = 10*log10(SIR0_linear);
 fprintf("part e:\n\tSIR0 = %.4f dB\n", SIR0_dB);
 
 % part f
@@ -219,11 +213,12 @@ fprintf("\trequired SNR = %.4f dB\n", SNR_required_dB);
 
 %% Q7
 
+fprintf("\nQuestion 7\n");
+
 num_bits = 1e5;
 bits = randi([0, 1], num_bits, 1);
 
-% = reshape(bits, 2, []).';
-
+% % QPSK constellation with gray coding (normalized to unit magnitude)
 % 00 -> ( +1 + j)/sqrt(2)
 % 01 -> ( -1 + j)/sqrt(2)
 % 11 -> ( -1 - j)/sqrt(2)
@@ -237,13 +232,13 @@ for n = 1:size(bit_pairs,1)
     b2 = bit_pairs(n,2);
 
     if b1==0 && b2==0
-        sym(n) = ( 1 + 1j)/sqrt(2);
+        sym(n) = (1 + 1j)/sqrt(2);
     elseif b1==0 && b2==1
         sym(n) = (-1 + 1j)/sqrt(2);
     elseif b1==1 && b2==1
         sym(n) = (-1 - 1j)/sqrt(2);
     elseif b1==1 && b2==0
-        sym(n) = ( 1 - 1j)/sqrt(2);
+        sym(n) = (1 - 1j)/sqrt(2);
     end
 end
 
@@ -264,7 +259,7 @@ ylabel('Envelope');
 
 % find average SIR in transmitted waveform
 Lh = length(rrc);
-d_tx = (Lh - 1)/2; % group delay (samples)
+d_tx = span*sps / 2; % group delay
 
 idxs = d_tx+1 : sps : length(x);   % valid peak locations in x
 Ns = min(length(sym), length(idxs));  % how many we can actually sample
@@ -285,20 +280,24 @@ fprintf("part a:\n\tavg SIR at TX output = %.4f dB\n", SIR_avg_dB);
 
 
 % part B
-snr_lin = 10^(SNR_required_dB/10);
+E_s = mean(abs(sym).^2); % average symbol energy
+E0 = sum(abs(rrc).^2); % energy in RX filter
 
-sig_pow = mean(abs(x).^2); % measured signal power
-noise_pow = sig_pow / snr_lin; % total complex noise power
+% signal power per symbol at MF output (no ISI)
+S = abs(gd0)^2 * E_s;
+SNR_required_lin = 10^(SNR_required_dB/10);
 
-w = sqrt(noise_pow/2) * (randn(size(x)) + 1j*randn(size(x)));
-r = x + w; % noisy received waveform
+N_out = S / SNR_required_lin; % desired noise power at MF output
+sigma_w2 = N_out / E0; % white noise variance at channel input
 
-y = filter(rrc, 1, r); % matched filter output (same length as r)
+% generate complex AWGN at channel
+w = sqrt(sigma_w2/2) * (randn(size(x)) + 1j*randn(size(x)));
+r = x + w;
 
-% Plot zoomed MF envelope (otherwise looks solid)
-num_syms_to_plot = 300;
-Nplot = num_syms_to_plot * sps;
+% matched filter output
+y = filter(rrc, 1, r);
 
+% plot zoomed MF envelope
 figure;
 plot(abs(y(1:Nplot)), 'LineWidth', 1);
 grid on;
@@ -306,32 +305,32 @@ title('Q7(b) MF output envelope |y[n]| (first 300 symbols)');
 xlabel('Sample index');
 ylabel('Envelope');
 
-% average SNIR at MF output 
-d_tot = span*sps; % total delay after Tx+Rx
-
-idxs_y = d_tot+1 : sps : length(y); % valid peak locations in y
+% average SNIR at MF output
+d_tot = span*sps;
+idxs_y = d_tot+1 : sps : length(y);
 Ns_y = min(length(sym), length(idxs_y));
 
 y_samp = y(idxs_y(1:Ns_y));
 sym_use = sym(1:Ns_y);
 
+% ideal RC contribution at MF output
+y_ideal = gd0 * sym_use;
+
 % ISI + noise
-err_mf = y_samp - sym_use;
+err_mf = y_samp - y_ideal;
 
-S_avg = mean(abs(sym_use).^2);
+S_avg = mean(abs(y_ideal).^2);
 IN_avg = mean(abs(err_mf).^2);
+SNIR_lin = S_avg / IN_avg;
+SNIR_dB = 10*log10(SNIR_lin);
 
-SNIR_avg_lin = S_avg / IN_avg;
-SNIR_avg_dB = 10*log10(SNIR_avg_lin);
-
-fprintf("part b:\n\tavg SNIR at MF output = %.4f dB\n", SNIR_avg_dB);
-%fprintf("\tused %d symbol samples (out of %d)\n", Ns_y, length(sym));
+fprintf("part b:\n\tavg SNIR at MF output = %.4f dB\n", SNIR_dB);
 
 
-% part C: decode symbols, SER and BER
+% part C - decode symbols, SER and BER
 const = [ ( 1+1j) (-1+1j) (-1-1j) ( 1-1j) ]/sqrt(2);
 
-% inverse Gray map aligned to "const" order above
+% inverse gray map corresponding to "const" order above
 bits_table = [0 0;   % for const(1)
               0 1;   % for const(2)
               1 1;   % for const(3)
@@ -345,7 +344,6 @@ for n = 1:Ns_y
     [~,k] = min(abs(y_samp(n) - const));
     dec_sym(n) = const(k);
 
-    % write decoded dibits
     dec_bits(2*n-1:2*n) = bits_table(k,:).';
 end
 
@@ -354,7 +352,6 @@ sym_errs = sum(dec_sym ~= sym_use);
 SER = sym_errs / Ns_y;
 
 % bit error rate 
-% Only compare bits that correspond to the Ns_y decoded symbols
 bits_use = bits(1:2*Ns_y);
 bit_errs = sum(dec_bits ~= bits_use);
 BER = bit_errs / (2*Ns_y);
