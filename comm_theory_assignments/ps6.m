@@ -197,6 +197,13 @@ bottom = [1 1 1 0]; % [B1, B2, B3, B4]
 % top: [1 1 0 1] bottom: [1 1 1 1]
 
 
+%% Q6
+% part A:
+% n = output bits per branch = 3
+% L = constraint length = (num states: 2^(L-1) = 4) => L=3
+% d_free = 7 (Hamming weight of 7 to go from position 0 back to 0)
+
+%% Q7
 
 
 
