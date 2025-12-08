@@ -164,3 +164,52 @@ fprintf('\n\tdecoded codeword:'); disp(c_hat);
 % check if we recovered the original codeword
 is_correct = isequal(c_hat, c_vec);
 fprintf('\tdid we recover the original codeword: %d\n', is_correct);
+
+
+%% Q4
+
+% part A: 
+% code rate = bits clocked in / bits cloced out = 2/3
+% constrain length (L) = max time depth in system = 5
+% number of states = 2^((L-1) * k) = 256
+
+% part B:
+% deck 5 slide 19
+% "for a rate k/n code, for each present state, there are exactly 2^k
+% previous states"
+% thus, there are 2^2 = 4 previous states
+
+% part C:
+top = [0 1 1 0]; % [T1, T2, T3, T4]
+bottom = [1 1 1 0]; % [B1, B2, B3, B4]
+
+% bits T2 T3 and T4 of the present top state were the bits T1 T2 and T3 of
+% the previous state ==> previous top must be [1 1 0 X] and the previous 
+% bottom must be [1 1 1 Y]
+
+% the inputs that caused this transition are the values currently in the 
+% first position -> Input top = 0, input bottom = 1
+
+% thus, the previous possible states are:
+% top: [1 1 0 0] bottom: [1 1 1 0]
+% top: [1 1 0 0] bottom: [1 1 1 1]
+% top: [1 1 0 1] bottom: [1 1 1 0]
+% top: [1 1 0 1] bottom: [1 1 1 1]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
