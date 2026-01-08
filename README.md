@@ -2,7 +2,7 @@
 
 The following was completed under the supervision of Jacob Koziej during the Spring 2024 semester.
 
-#### Note: This repository includes MATLAB code for ECE210, ECE211, and MA224
+#### Note: This repository includes MATLAB code for ECE210, ECE211, ECE300, ECE302, ECE310, and MA224
 - `assignments` directory: ECE210 (MATLAB Seminar) assignments
 - `signals_assignments` directory: ECE211 (Signal Processing) assignments
 - `comm_theory_assignments` directory: ECE300 (Communication Theory) assignments
